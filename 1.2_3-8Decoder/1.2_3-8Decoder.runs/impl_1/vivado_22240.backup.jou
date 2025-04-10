@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:35:27 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Thu Apr 10 21:31:11 2025
+# Process ID         : 22240
+# Current directory  : C:/Users/wxinb/Documents/homework/DigitalCircuitsHomework/1.2_3-8Decoder/1.2_3-8Decoder.runs/impl_1
+# Command line       : vivado.exe -log Decoder.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source Decoder.tcl -notrace
+# Log file           : C:/Users/wxinb/Documents/homework/DigitalCircuitsHomework/1.2_3-8Decoder/1.2_3-8Decoder.runs/impl_1/Decoder.vdi
+# Journal file       : C:/Users/wxinb/Documents/homework/DigitalCircuitsHomework/1.2_3-8Decoder/1.2_3-8Decoder.runs/impl_1\vivado.jou
+# Running On         : xbb
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26100
+# Processor Detail   : 13th Gen Intel(R) Core(TM) i7-13700H
+# CPU Frequency      : 2918 MHz
+# CPU Physical cores : 14
+# CPU Logical cores  : 20
+# Host memory        : 16788 MB
+# Swap memory        : 20892 MB
+# Total Virtual      : 37680 MB
+# Available Virtual  : 9657 MB
+#-----------------------------------------------------------
+source Decoder.tcl -notrace
