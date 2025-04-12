@@ -6,6 +6,7 @@
 
 # 不忽略 .gitignore 文件
 !.gitignore
+!LICENSE
 
 # 不忽略 srcs/ 目录及其所有内容
 !*/*srcs/
