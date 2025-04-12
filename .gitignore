@@ -8,8 +8,8 @@
 !.gitignore
 
 # 不忽略 srcs/ 目录及其所有内容
-!*srcs/
-!*srcs/**
+!*/*srcs/
+!*/*srcs/**
 
 # 不忽略特定文件类型
 !*.xpr
