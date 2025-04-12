@@ -1,0 +1,24 @@
+# 忽略所有文件
+*
+
+# 不忽略所有目录
+!*/
+
+# 不忽略 .gitignore 文件
+!.gitignore
+!LICENSE
+
+# 不忽略 srcs/ 目录及其所有内容
+!*/*srcs/
+!*/*srcs/**
+
+# 不忽略特定文件类型
+!*.xpr
+!*/*.xdc
+!*.v
+!*.sv
+!*.bit
+!*.bin
+!*.mcs
+!*.mem
+!*.md
