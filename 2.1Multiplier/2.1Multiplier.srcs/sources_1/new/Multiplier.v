@@ -1,65 +1,76 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2025/04/15 21:52:57
-// Design Name: 
-// Module Name: Multiplier
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module multiplier_display (
     input clk,
     input [7:0] sw,           // SW[3:0] = A, SW[7:4] = B
-    output reg [6:0] seg,     // 7段数码管段选
-    output reg [3:0] an       // 4位数码管位选
+    output reg [6:0] seg,     // 数码管段选
+    output reg [3:0] an       // 数码管位选
 );
-    // === 输入分离 ===
-    wire [3:0] a = sw[3:0];
-    wire [3:0] b = sw[7:4];
 
-    // === 移位相加乘法 ===
-    reg [7:0] result = 0;
+    // === 输入同步 ===
+    reg [7:0] sw_sync_0, sw_sync_1;
+    always @(posedge clk) begin
+        sw_sync_0 <= sw;
+        sw_sync_1 <= sw_sync_0;
+    end
+    wire [7:0] sw_stable = sw_sync_1;
+    wire [3:0] a = sw_stable[3:0];
+    wire [3:0] b = sw_stable[7:4];
+
+    // === 检测输入变化 ===
+    reg [7:0] prev_sw = 0;
+    wire input_changed = (sw_stable != prev_sw);
+
+    // === 状态机定义 ===
+    reg [3:0] state = 0;
+    parameter IDLE = 0, TRIGGER = 1, CALC = 2, DONE = 3;
+
     reg [7:0] multiplicand;
     reg [3:0] multiplier;
-    reg [3:0] count = 0;
-    reg [7:0] accumulator = 0;
+    reg [7:0] accumulator;
+    reg [3:0] count;
+    reg [7:0] result = 0;
 
     always @(posedge clk) begin
-        if (count == 0) begin
-            multiplicand <= {4'b0000, a};
-            multiplier <= b;
-            accumulator <= 0;
-            count <= 4;
-        end else begin
-            if (multiplier[0] == 1)
-                accumulator <= accumulator + multiplicand;
-            multiplicand <= multiplicand << 1;
-            multiplier <= multiplier >> 1;
-            count <= count - 1;
-        end
-        result <= accumulator;
+        case (state)
+            IDLE: begin
+                if (input_changed) begin
+                    prev_sw <= sw_stable;
+                    state <= TRIGGER;
+                end
+            end
+            TRIGGER: begin
+                multiplicand <= {4'b0000, a};
+                multiplier <= b;
+                accumulator <= 0;
+                count <= 4;
+                state <= CALC;
+            end
+            CALC: begin
+                if (count > 0) begin
+                    if (multiplier[0])
+                        accumulator <= accumulator + multiplicand;
+                    multiplicand <= multiplicand << 1;
+                    multiplier <= multiplier >> 1;
+                    count <= count - 1;
+                end else begin
+                    result <= accumulator;
+                    state <= DONE;
+                end
+            end
+            DONE: begin
+                state <= IDLE;
+            end
+        endcase
     end
 
-    // === 二进制转BCD ===
-    reg [3:0] hundreds, tens, ones;
+    // === BCD 转换 ===
     reg [19:0] shift;
+    reg [3:0] hundreds, tens, ones;
     integer i;
 
     always @(*) begin
-        shift = 20'd0;
+        shift = 0;
         shift[7:0] = result;
 
         for (i = 0; i < 8; i = i + 1) begin
@@ -74,18 +85,26 @@ module multiplier_display (
         ones     = shift[11:8];
     end
 
-    // === 数码管显示 ===
-    reg [15:0] clkdiv;
+    // === 数码管动态刷新（死区 + 空白帧）===
+    reg [15:0] clkdiv = 0;
+    reg [2:0] scan_idx = 0;
     reg [3:0] digit;
 
-    always @(posedge clk)
+    always @(posedge clk) begin
         clkdiv <= clkdiv + 1;
+        scan_idx <= clkdiv[15:13];
+    end
 
     always @(*) begin
-        case (clkdiv[15:14])  // 控制显示的哪一位
-            2'b00: begin an = 4'b1110; digit = ones; end
-            2'b01: begin an = 4'b1101; digit = tens; end
-            2'b10: begin an = 4'b1011; digit = hundreds; end
+        an = 4'b1111;
+        seg = 7'b1111111;
+
+        case (scan_idx)
+            3'd0: begin an = 4'b1110; digit = ones; end
+            3'd1: begin an = 4'b1101; digit = tens; end
+            3'd2: begin an = 4'b1011; digit = hundreds; end
+            3'd3: begin an = 4'b1111; digit = 4'd0; end  // 空白帧
+            3'd7: begin an = 4'b1111; digit = 4'd0; end  // 死区
             default: begin an = 4'b1111; digit = 4'd0; end
         endcase
 
@@ -103,4 +122,5 @@ module multiplier_display (
             default: seg = 7'b1111111;
         endcase
     end
+
 endmodule
