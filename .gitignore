@@ -11,6 +11,8 @@
 # 不忽略 srcs/ 目录及其所有内容
 !*/*srcs/
 !*/*srcs/**
+!./visio/
+!images/
 
 # 不忽略特定文件类型
 !*.xpr
@@ -22,3 +24,7 @@
 !*.mcs
 !*.mem
 !*.md
+!*.pdf
+!*.docx
+!*.png
+!*.vsdx
